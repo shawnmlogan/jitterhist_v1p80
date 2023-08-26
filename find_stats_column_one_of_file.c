@@ -36,7 +36,6 @@ else
 			sum_values = sum_values + sample_value;
 			number_of_input_lines++;
 			}
-			i++;
 		}
 	fclose(fpw1);
 	ave_value = sum_values/((double) number_of_input_lines);
