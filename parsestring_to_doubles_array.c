@@ -18,7 +18,7 @@ plocal_string = &local_string[0];
 pdouble_string = &double_string[0];
 ptemp = &temp[0];
 
-plocal_string = pinput_string;
+strcpy(plocal_string,pinput_string);
 
 *parray_size = 0;
 
@@ -33,12 +33,12 @@ do
 	{
 	string_char = local_string[i];
 	double_string[j] = string_char;
-	/*printf("Read character \"%c\".\n",string_char);*/
+	/* printf("Read character \"%c\".\n",string_char); */
 	if ((string_char == delim) || (i == strlen(pinput_string)))
 		{
 		double_string[j] = '\0';
 		temp_double = strtod(pdouble_string,&ptemp);
-		/*printf("j = %d, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",j,pdouble_string,ptemp,strlen(ptemp));*/
+		/* printf("j = %d, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",j,pdouble_string,ptemp,strlen(ptemp)); */
 		if (strlen(ptemp) == 0)
 			{
 			*ptemp_pointer = temp_double;

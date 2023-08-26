@@ -325,7 +325,7 @@ if( num_periods > 0)
 				}
 			else
 				{
-				printf("Removing effect of residual slope in negative egde TIE:\nslope_neg_edge = %1.6e, intercept_neg_edge = %1.6e\n",slope_neg_edge,intercept_neg_edge);
+				printf("Removing effect of residual slope in negative edge TIE:\nslope_neg_edge = %1.6e, intercept_neg_edge = %1.6e\n",slope_neg_edge,intercept_neg_edge);
 				}
 		
 			if (find_slope_intercept_xy(px1y1,i,&slope_pos_edge,&intercept_pos_edge) != EXIT_SUCCESS)

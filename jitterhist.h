@@ -13,8 +13,8 @@
 #define NUMBER_OF_VALUE_STRINGS 12 /*Used for add_units arguments*/
 #define LINELENGTH_OF_VALUE_STRING 20
 
-#define VERSION 1.15
-#define VERSION_DATE "8/25/2023"
+#define VERSION 1.151
+#define VERSION_DATE "8/26/2023"
 
 typedef struct {
 	double x,y;
