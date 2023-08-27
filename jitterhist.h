@@ -12,14 +12,25 @@
 #define DATA_COLUMNS 3
 #define NUMBER_OF_VALUE_STRINGS 12 /*Used for add_units arguments*/
 #define LINELENGTH_OF_VALUE_STRING 20
+#define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.151
-#define VERSION_DATE "8/26/2023"
+#define VERSION 1.152
+#define VERSION_DATE "8/27/2023"
 
 typedef struct {
 	double x,y;
 	} xy_pair;
 
+typedef struct {
+	long int num_periods;
+	double ave_period;
+	double ave_ontime;
+	double min_period, min_period_time;
+	double max_period, max_period_time;
+	double min_ontime, min_ontime_time;
+	double max_ontime, max_ontime_time;
+	} zero_crossing_stats;	
+	
 /*Function prototypes*/
 
 void program_info();
@@ -42,3 +53,4 @@ int *num_moving_average_samples, int *use_ave_freq, double *ave_freq_MHz,long in
 
 int moving_average(char *pfilein, char *pfileout,int number_of_data_columns,int num_moving_average_samples,long int *pnumber_output_lines);
 
+int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats);
