@@ -13,9 +13,6 @@ double **pinput_data_array;
 
 FILE *fpw1, *fpw2;
 
-fpw1 = fopen(pfilein,"r");
-fpw2 = fopen(pfileout,"w");
-
 pinput_string = &input_string[0];
 
 if ((pdoubles_array = (double *) calloc(number_of_data_columns,sizeof(double))) == NULL)
@@ -32,8 +29,12 @@ else
 		{
 		fgets(pinput_string,LINELENGTH,fpw1);
 		remove_carriage_return(pinput_string);
-		if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
-			number_of_input_lines++;
+		if (!feof(fpw1))
+			{
+
+			if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+				number_of_input_lines++;
+			}
 		}
 	fclose(fpw1);
 	
@@ -65,13 +66,16 @@ else
 				{
 				fgets(pinput_string,LINELENGTH,fpw1);
 				remove_carriage_return(pinput_string);
-				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+				if (!feof(fpw1))
 					{
-					for(j = 0; j < number_of_data_columns;j++)
-						{
-						pinput_data_array[i][j] = pdoubles_array[j];
+					if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+						{ 
+						for(j = 0; j < number_of_data_columns;j++)
+							{
+							pinput_data_array[i][j] = pdoubles_array[j];
+							}
+						i++;
 						}
-					i++;
 					}
 				}
 			fclose(fpw1);
@@ -81,7 +85,7 @@ else
 			fpw1 = fopen(pfilein,"r");
 			fpw2 = fopen(pfileout,"w");
 			
-			for(i = num_moving_average_samples; i < (number_of_input_lines - 2*num_moving_average_samples + 0);i++)
+			for(i = num_moving_average_samples; i < (number_of_input_lines - num_moving_average_samples);i++)
 				{
 				for(j = 0; j < number_of_data_columns;j++)
 					{
