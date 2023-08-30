@@ -138,7 +138,7 @@ while (!feof(fpw1))
       tpos_error = tpos - t0 - (num_periods * ave_period);
 /*printf("At time = %1.6e:tneg_error = %1.6e tpos_error = %1.6e\n",time,tneg_error,tpos_error);*/
       if (writefile == 1)
-         fprintf(fpw2, "%2.6e,%2.4e, %2.4e\n",time, tneg_error/ave_period, tpos_error/ave_period);
+         fprintf(fpw2, "%1.8e,%1.6e,%1.6e\n",time,tneg_error/ave_period,tpos_error/ave_period);
             
       if (tneg_error > tneg_error_max)
          tneg_error_max = tneg_error;

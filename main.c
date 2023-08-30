@@ -183,14 +183,17 @@ if( pzc_stats->num_periods > 0)
 				{
 				fgets(pinput_string,LINELENGTH,fpw1);
 				remove_carriage_return(pinput_string);
-				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,DATA_COLUMNS)) == EXIT_SUCCESS)
+				if (!feof(fpw1))
 					{
-					pxy[i].x = pdoubles_array[0];
-					pxy[i].y = pdoubles_array[1];
-					px1y1[i].x = pdoubles_array[0];
-					px1y1[i].y = pdoubles_array[2];
-					/*printf("i = %ld wrote pxy->x and pxy->y as %1.12e,%1.12e.\n",i,pxy->x,pxy->y);*/
-					i++;
+					if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,DATA_COLUMNS)) == EXIT_SUCCESS)
+						{
+						pxy[i].x = pdoubles_array[0];
+						pxy[i].y = pdoubles_array[1];
+						px1y1[i].x = pdoubles_array[0];
+						px1y1[i].y = pdoubles_array[2];
+						/* printf("i = %d wrote pxy->x and pxy->y as %1.12e,%1.12e.\n",i,pxy->x,pxy->y); */
+						i++;
+						}
 					}
 				}
 			fclose(fpw1);
@@ -236,23 +239,26 @@ if( pzc_stats->num_periods > 0)
 				{
 				fgets(pinput_string,LINELENGTH,fpw1);
 				remove_carriage_return(pinput_string);
+				if (!feof(fpw1))
+					{
 				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,DATA_COLUMNS)) == EXIT_SUCCESS)
 					{
-					corrected_neg_edge_tie = pdoubles_array[1] - (pdoubles_array[0]*slope_neg_edge + intercept_neg_edge);
-					if (corrected_neg_edge_tie > corrected_neg_edge_tie_max)
-						corrected_neg_edge_tie_max = corrected_neg_edge_tie;
-					if (corrected_neg_edge_tie < corrected_neg_edge_tie_min)
-						corrected_neg_edge_tie_min = corrected_neg_edge_tie;
-		
-					corrected_pos_edge_tie = pdoubles_array[2] - (pdoubles_array[0]*slope_pos_edge + intercept_pos_edge);
-					if (corrected_pos_edge_tie > corrected_pos_edge_tie_max)
-						corrected_pos_edge_tie_max = corrected_pos_edge_tie;
-					if (corrected_pos_edge_tie < corrected_pos_edge_tie_min)
-						corrected_pos_edge_tie_min = corrected_pos_edge_tie;
-					
-					fprintf(fpw2,"%1.12e,%1.12e,%1.12e\n",pdoubles_array[0],corrected_neg_edge_tie,
-					corrected_pos_edge_tie);
-					i++;
+						corrected_neg_edge_tie = pdoubles_array[1] - (pdoubles_array[0]*slope_neg_edge + intercept_neg_edge);
+						if (corrected_neg_edge_tie > corrected_neg_edge_tie_max)
+							corrected_neg_edge_tie_max = corrected_neg_edge_tie;
+						if (corrected_neg_edge_tie < corrected_neg_edge_tie_min)
+							corrected_neg_edge_tie_min = corrected_neg_edge_tie;
+			
+						corrected_pos_edge_tie = pdoubles_array[2] - (pdoubles_array[0]*slope_pos_edge + intercept_pos_edge);
+						if (corrected_pos_edge_tie > corrected_pos_edge_tie_max)
+							corrected_pos_edge_tie_max = corrected_pos_edge_tie;
+						if (corrected_pos_edge_tie < corrected_pos_edge_tie_min)
+							corrected_pos_edge_tie_min = corrected_pos_edge_tie;
+						
+						fprintf(fpw2,"%1.12e,%1.12e,%1.12e\n",pdoubles_array[0],corrected_neg_edge_tie,
+						corrected_pos_edge_tie);
+						i++;
+						}
 					}
 				}
 			fclose(fpw1);

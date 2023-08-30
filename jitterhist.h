@@ -8,14 +8,15 @@
 #define DEBUG
 #define BIG_POS_NUM 1.0e12
 #define BIG_NEG_NUM -1.0e12
+#define EPSILON 1.0e-12
 
 #define DATA_COLUMNS 3
 #define NUMBER_OF_VALUE_STRINGS 12 /*Used for add_units arguments*/
 #define LINELENGTH_OF_VALUE_STRING 20
 #define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.154
-#define VERSION_DATE "8/29/2023"
+#define VERSION 1.155
+#define VERSION_DATE "8/30/2023"
 
 typedef struct {
 	double x,y;
