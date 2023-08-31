@@ -80,7 +80,7 @@ if (num_moving_average_samples > 0)
 		{
 		if (moving_average(pfin,ptempfile,1,num_moving_average_samples,&number_of_output_lines) != EXIT_SUCCESS)
 			{
-			printf("moving_average() failed...\n");
+			printf("moving_average() failed...exiting\n");
 			exit(0);
 			}
 		find_zero_crossings(ptempfile,threshold,deltat,number_of_data_columns,pzc_stats);
