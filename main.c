@@ -2,7 +2,7 @@
 
 int main(int argc,char *argv[])
 {
-int i, writefile = 1, number_of_data_columns = 1;
+int i, writefile = 1, number_of_data_columns = 1, glitch_flag = 0;
 int tokens = 0, use_ave_freq_flag = 0, correct_slope_flag = 0;;
 int num_moving_average_samples = 0;
 long int number_of_input_lines = 0, number_of_output_lines = 0;
@@ -94,10 +94,16 @@ if (num_moving_average_samples > 0)
 			num_moving_average_samples++;
 			printf("Threshold crossings occur too quickly, increasing number of moving average ");
 			printf("samples to %d.\n",num_moving_average_samples);
+			glitch_flag = 1;
 			}
+		else
+			{
+			glitch_flag = 0;
+			}
+		/*printf("i = %d, glitch_flag was set to %d.\n",i,glitch_flag);*/
 		i++;
 		}
-		while (((duty_cycle_max_percent > 99.0) || (duty_cycle_min_percent < 1.0)) && (i < MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS) && ((double) num_moving_average_samples < (ceil(number_of_output_lines/2) - 1)));
+		while ((glitch_flag == 1) && (i < MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS) && ((double) num_moving_average_samples < (ceil(number_of_output_lines/2) - 1)));
 
 	if (i == MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS)
 		{

@@ -15,8 +15,8 @@
 #define LINELENGTH_OF_VALUE_STRING 20
 #define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.156
-#define VERSION_DATE "8/31/2023"
+#define VERSION 1.157
+#define VERSION_DATE "9/24/2023"
 
 typedef struct {
 	double x,y;

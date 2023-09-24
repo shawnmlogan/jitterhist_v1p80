@@ -116,9 +116,9 @@ else
 							fprintf(fpw2,"%1.12e\n",sample_value);
 						}
 					}
+				*pnumber_output_lines = i - num_moving_average_samples + 1;
 				fclose(fpw1);
 				fclose(fpw2);
-				
 				for(i = 0; i < number_of_input_lines; i++)
 					free(pinput_data_array[i]);
 				}
