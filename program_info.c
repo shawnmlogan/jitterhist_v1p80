@@ -25,7 +25,7 @@ if (verbose == 1)
 	printf("\tj. Updated to include columm number of input data and to plot and\n\t");
 	printf("annotate jitter or corrected jitter if requested. Fixed numerous bugs\n\t");
 	printf("in parsestring_to_doubles_array.c, find_zero_crossings, add_units.c, and datascan.c.\n\t");
-	printf("Added new functions check_executable(),find_base_filename(),\n\t);
+	printf("Added new functions check_executable(),find_base_filename(),\n\t");
 	printf("and find_stats_column_N_of_file()\n\n");
 	}
 }
