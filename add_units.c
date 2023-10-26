@@ -30,11 +30,11 @@ else
                sprintf(pvalue_string_local,"%.*f %s",num_digits,value,suffix);
             else
                {  
-               if (fabs(value) < 100e3)
+               if (fabs(value) < 1e6)
                   sprintf(pvalue_string_local,"%.*f k%s",num_digits,value/1e3,suffix);
                else
                   {
-                  if (fabs(value) < 100e6)
+                  if (fabs(value) < 1e9)
                       sprintf(pvalue_string_local,"%.*f M%s",num_digits,value/1e6,suffix);
                   else
                      {

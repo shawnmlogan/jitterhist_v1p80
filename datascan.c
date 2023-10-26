@@ -1,11 +1,11 @@
 #include "jitterhist.h"
 
-int datascan(char fin[],char fout[],int writefile,double ave_period,\
-double deltat, double vthreshold,\
+int datascan(char *pfin,int column_number, char *pfout,int writefile,double ave_period,\
+double deltat, double threshold,\
 double *pmax_pp_neg_edge_error,double *pmax_pp_pos_edge_error)
 {
 
-int j = 0, tokens, number_of_data_columns = 1;
+int j = 0, tokens, found_value_flag = 0;
 long int num_periods = 0;
 
 char *pinput_string, input_string[LINELENGTH+1];
@@ -17,7 +17,7 @@ double tneg_error_max = BIG_NEG_NUM, tneg_error_min = BIG_POS_NUM, tpos_error_ma
 double tpos_error_min = BIG_POS_NUM, tneg_error = 0.0, tpos_error = 0.0;
 double max_pp_neg_edge_error = 0.0, max_pp_pos_edge_error = 0.0;
 double last_value =0.0, slope = 0.0, intercept = 0.0, t0 = 0.0;
-double *pdoubles_array,doubles_array[DATA_COLUMNS];
+double *pdoubles_array;
 
 FILE *fpw1,*fpw2;
 
@@ -30,49 +30,60 @@ pvalue0 = &value0;
 
 /*Open input and output file - only open output file if writefile is 1*/
 
-if ((pdoubles_array = (double *) calloc(1,sizeof(double))) == NULL)
+if ((pdoubles_array = (double *) calloc(column_number,sizeof(double))) == NULL)
 	{
 	printf("Error allocating memory for pdoubles_array in main()...exiting\n");
 	exit(0);
 	}
 
-fpw1 = fopen(fin,"r");
-
 if (writefile == 1)
    {
-   fpw2 = fopen(fout,"w");
+   fpw2 = fopen(pfout,"w");
    fprintf(fpw2,"Time(sec),Neg Edge Error(UI),Pos Edge Error(UI)\n");
    }
-fscanf(fpw1,"%lf",pvalue0);
+found_value_flag = 0;
+fpw1 = fopen(pfin,"r");
 
-while (value0 > vthreshold)
+/*Look for time of first threshold crossing in data*/
+
+while (found_value_flag == 0)
+	{
+	fgets(pinput_string,LINELENGTH,fpw1);
+	remove_carriage_return(pinput_string);
+	if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,column_number)) == EXIT_SUCCESS)
+		{
+		value0 = pdoubles_array[column_number-1];
+		/* printf("Initial value0 = %1.6e.\n",value0); */
+		found_value_flag = 1;
+		}
+	}
+time = 0.0;
+
+while ((value0 > threshold) && !feof(fpw1))
    {
    fgets(pinput_string,LINELENGTH,fpw1);
 	remove_carriage_return(pinput_string);
-	if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+	if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,column_number)) == EXIT_SUCCESS)
 		{
-		for(j = 0; j < number_of_data_columns;j++)
-			{
-			value0 = pdoubles_array[j];
-			}
+		value0 = pdoubles_array[column_number-1];
+		time += deltat;
+		/* printf("while loop 1, time = %1.6e, value0 = %1.6e.\n",time,value0); */
 		}
-   time += deltat;
    }
-/*Now we've found a negative value - look for first zero crossing*/
 
-while (value0 <= vthreshold)
+/*Now we've found a negative value - look for first threshold crossing*/
+
+while ((value0 <= threshold) && !feof(fpw1))
    {
    last_value = value0;
    fgets(pinput_string,LINELENGTH,fpw1);
 	remove_carriage_return(pinput_string);
-	if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+	if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,column_number)) == EXIT_SUCCESS)
 		{
-		for(j = 0; j < number_of_data_columns;j++)
-			{
-			value0 = pdoubles_array[j];
-			}
+		value0 = pdoubles_array[column_number-1];
+		time += deltat;
+		/* printf("while loop 2, time = %1.6e, value0 = %1.6e.\n",time,value0); */
 		}
-   time += deltat;
    }
 
 /*Save this first zero crossing with positive slope  - reset time to zero and now look for next positive edge*/
@@ -81,62 +92,62 @@ while (value0 <= vthreshold)
 
 slope = (value0 - last_value)/deltat;
 intercept = (last_value*time - value0*(time - deltat))/deltat;
-
-t0 = (vthreshold - intercept)/slope;
+/* printf("value0 = %1.6e, last_value = %1.6e, ",value0,last_value);
+printf("time = %1.6e, time-delta = %1.6e.\n",time,time - deltat); */
+t0 = (threshold - intercept)/slope;
 
 /*Zero crossings with positive slope should occur when  freq * time = N where N = 0,2,4,...*/
 
 while (!feof(fpw1))
    {
-   while ((value0 > vthreshold) && !feof(fpw1))
+   while ((value0 > threshold) && !feof(fpw1))
       {
       last_value = value0;
       fgets(pinput_string,LINELENGTH,fpw1);
 		remove_carriage_return(pinput_string);
-		if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+		if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,column_number)) == EXIT_SUCCESS)
 			{
-			for(j = 0; j < number_of_data_columns;j++)
-				{
-				value0 = pdoubles_array[j];
-				time += deltat;
-				}
+			value0 = pdoubles_array[column_number-1];
+			time += deltat;
 			}
       }
+      
    /*Save time of negative going zero crossing*/
+   
    if (!feof(fpw1))
       {
       slope = (value0 - last_value)/deltat;
       intercept = (last_value*time - value0*(time - deltat))/deltat;
-      tneg = (vthreshold - intercept)/slope;
+      tneg = (threshold - intercept)/slope;
       }
-/*printf("tneg = %1.6e\n",tneg);*/
    
-   while ((value0 <= vthreshold) && !feof(fpw1))
+   while ((value0 <= threshold) && !feof(fpw1))
       {
       last_value = value0;
       fgets(pinput_string,LINELENGTH,fpw1);
 		remove_carriage_return(pinput_string);
-		if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,number_of_data_columns)) == EXIT_SUCCESS)
+		if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,column_number)) == EXIT_SUCCESS)
 			{
-			for(j = 0; j < number_of_data_columns;j++)
-				{
-				value0 = pdoubles_array[j];
-				time += deltat;
-				}
+			value0 = pdoubles_array[column_number-1];
+			time += deltat;
 			}
       }
+      
    /*Save time of positive going zero crossing*/
+   
    if (!feof(fpw1))
       {
       slope = (value0 - last_value)/deltat;
       intercept = (last_value*time - value0*(time - deltat))/deltat;
-      tpos = (vthreshold - intercept)/slope;
-/*printf("tpos = %1.6e\n",tpos);*/
+      tpos = (threshold - intercept)/slope;
 
       num_periods += 1;
       tneg_error = tneg - t0 - (num_periods - 0.50) * ave_period;
       tpos_error = tpos - t0 - (num_periods * ave_period);
-/*printf("At time = %1.6e:tneg_error = %1.6e tpos_error = %1.6e\n",time,tneg_error,tpos_error);*/
+      
+      /*printf("time = %1.8e, num_periods = %ld, ave_period = %1.6e, TIE neg = %1.6e,TIE pos = %1.6e\n",time,num_periods,ave_period,tneg_error/ave_period,tpos_error/ave_period);
+		printf("At time = %1.6e:tneg_error = %1.6e tpos_error = %1.6e\n",time,tneg_error,tpos_error); */
+		
       if (writefile == 1)
          fprintf(fpw2, "%1.8e,%1.6e,%1.6e\n",time,tneg_error/ave_period,tpos_error/ave_period);
             

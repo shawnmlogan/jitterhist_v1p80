@@ -37,17 +37,33 @@ do
 	if ((string_char == delim) || (i == strlen(pinput_string)))
 		{
 		double_string[j] = '\0';
+		errno = 0;
 		temp_double = strtod(pdouble_string,&ptemp);
-		/* printf("j = %d, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",j,pdouble_string,ptemp,strlen(ptemp)); */
-		if (strlen(ptemp) == 0)
-			{
+		/* printf("j = %d, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",j,pdouble_string,ptemp,strlen(ptemp));*/
+		if (errno == ERANGE)
+        {
+            /* printf("Sorry, this number is too small or too large.\n"); */
+            skip_string_flag = 1;
+        }
+        else if (ptemp == pdouble_string)
+        {
+            skip_string_flag = 1;
+            /* printf("No conversion performed for input string \"%s\".\n",pinput_string); */
+        }
+        else if (*ptemp && *ptemp != '\n')
+        {
+            // *ptemp is neither end of string nor newline,
+            // so we didn't convert the *whole* input
+            skip_string_flag = 1;
+        }
+        else
+        {
+        /* printf("i = %d, Conversion performed successfully to %1.6e!\n",i,temp_double); */
 			*ptemp_pointer = temp_double;
 			ptemp_pointer++;
 			*parray_size = *parray_size + 1;
 			j = -1;				
-			}
-		else
-			skip_string_flag = 1;
+        }
 		}
 	i++;
 	j++;
@@ -56,7 +72,10 @@ while ( (i < (strlen(plocal_string) + 1)) && (skip_string_flag != 1) && (*parray
 
 
 if (skip_string_flag == 1)
+	{
+	/* printf("EXIT_FAILURE!\n"); */
 	return EXIT_FAILURE;
+	}
 else
 	return EXIT_SUCCESS;
 }
