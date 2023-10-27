@@ -327,7 +327,6 @@ if( pzc_stats->num_periods > 0)
 		sprintf(pgnuplot_command_1,"gnuplot -e 'base_filename = \"%s\"; plot_title = \"%s\"; nom_freq_text = \"%s\";' /Users/sml/cproj/jitterhist/jitterhistv160/plotting_routines/gnuplot/plot_jitter.gnu \n",pbase_filename,ptitle_string,add_units(1.0/pzc_stats->ave_period_corrected,6,"Hz",value_string[0]));
 
 		system(pgnuplot_command_1);
-		printf("\n%s\n",pgnuplot_command_1);
 		
 		if ((check_executable(pgimp,pgimp_path)) != 0)
 			{
