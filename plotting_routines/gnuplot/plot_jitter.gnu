@@ -48,11 +48,11 @@ if (neg_error_min < pos_error_min) {
 	y_min = pos_error_min;
 	}
 
-plot_header = sprintf("{/:Bold*1.1 File \"%s.csv\" Negative and Positive Time Interval Error versus Time}\n{/:Bold Time interval error computed relative to %s}\n%s",base_filename_text,nom_freq_text,plot_title);
+plot_header = sprintf("{/:Bold Negative and Positive Time Interval Error versus Time}\n{/:Bold Time interval error computed relative to %s}\n%s, {/:Bold filename:}\n %s.csv",nom_freq_text,plot_title,base_filename_text);
 set title plot_header;
 
 # Offset title using graph coordinates to better fit page (range 0.0 to 1.0)
-set title offset graph -0.02,0.0; 
+set title offset graph -0.04,0.0; 
 
 set xlabel 'Time (s)';
 set ylabel 'Time Interval Error (UI)';
@@ -84,7 +84,7 @@ plot input_filename u 1:2 title columnhead(2) with lines lw 1,input_filename u 1
 
 pause(5);
 set terminal push;
-set terminal pngcairo size 1200,600 font "Verdana,12";
+set terminal pngcairo size 1250,600 font "Verdana,12";
 set termopt enhanced;
 set key center default opaque;
 
