@@ -18,6 +18,7 @@ char *pgimp = "gimp",*pgimp_path, gimp_path[LINELENGTH + 1];
 char *pgnuplot_command_1, gnuplot_command_1[LINELENGTH + 1];
 char *pgnuplot_command_2, gnuplot_command_2[LINELENGTH + 1];
 char *ptitle_string, title_string[LINELENGTH + 1];
+char *ptimestamp,timestamp[LINELENGTH + 1];
 
 double fs_GHz, deltat = 0.0;
 double ave_freq_MHz = 0.0;
@@ -41,6 +42,7 @@ pfout = &fout[0];
 pfout_corrected = &fout_corrected[0];
 pbase_filename = &base_filename[0];
 pinput_string = &input_string[0];
+ptimestamp = &timestamp[0];
 pmax_pp_pos_edge_error = &max_pp_pos_edge_error;
 pmax_pp_neg_edge_error = &max_pp_neg_edge_error;
 ptempfile = &tempfile[0];
@@ -56,7 +58,11 @@ if (((pzc_stats = (zero_crossing_stats *) calloc(1,sizeof(zero_crossing_stats)))
 	exit(0);
 	}
 
-strcpy(ptempfile,"./.tempfilej");
+/* Find timestamp to append to filename and prevent multiple instantiations of
+jitterhistv16 in same directory from writing to same file */
+	
+find_timestamp(ptimestamp,LINELENGTH);
+sprintf(ptempfile,"./.tempfilej_%s",ptimestamp);
 
 /*Explain program*/
 
@@ -324,7 +330,7 @@ if( pzc_stats->num_periods > 0)
 		
 		sprintf(ptitle_string,"{/:Bold Sample frequency = %s, number of moving average samples = %d}",add_units(1e9*fs_GHz,1,"Hz",value_string[0]),num_moving_average_samples);
 		
-		sprintf(pgnuplot_command_1,"gnuplot -e 'base_filename = \"%s\"; plot_title = \"%s\"; nom_freq_text = \"%s\";' /Users/sml/cproj/jitterhist/jitterhistv160/plotting_routines/gnuplot/plot_jitter.gnu \n",pbase_filename,ptitle_string,add_units(1.0/pzc_stats->ave_period_corrected,6,"Hz",value_string[0]));
+		sprintf(pgnuplot_command_1,"gnuplot -e 'base_filename = \"%s\"; plot_title = \"%s\"; nom_freq_text = \"%s\";' %s/plotting_routines/gnuplot/plot_jitter.gnu \n",pbase_filename,ptitle_string,add_units(1.0/pzc_stats->ave_period_corrected,6,"Hz",value_string[0]),PLOTTING_ROUTINES_DIR);
 
 		system(pgnuplot_command_1);
 		

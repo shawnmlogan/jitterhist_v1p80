@@ -4,6 +4,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <errno.h>
+#include <time.h>
 
 #define LINELENGTH 180
 #define DEBUG
@@ -16,8 +17,8 @@
 #define LINELENGTH_OF_VALUE_STRING 20
 #define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.160
-#define VERSION_DATE "10/26/2023"
+#define VERSION 1.161
+#define VERSION_DATE "11/3/2023"
 
 typedef struct {
 	double x,y;
@@ -59,3 +60,6 @@ int *num_moving_average_samples, int *use_ave_freq, double *ave_freq_MHz,long in
 int moving_average(char *pfilein, char *pfileout,int column_number,int num_moving_average_samples,long int *pnumber_output_lines);
 
 int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats);
+
+int find_timestamp(char *pdate_string,int max_characters);
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhistv161"
