@@ -72,7 +72,7 @@ program_info(verbose);
  
 if (argc < 9 || argc > 11)
    {
-   printf("Usage: jitterhist <inputfile> <column_number> <outputfile> <Sample frequency (GHz)> ");
+   printf("Usage: jitterhistv16 <inputfile> <column_number> <outputfile> <Sample frequency (GHz)> ");
    printf("<vthreshold> <num_moving_average_samples> <correct_slope?(y|n)> <Use ave period?(y|n)> <Freq_to_use (MHz) if \"n\">\n");
    exit(0);
    }
@@ -81,7 +81,7 @@ else
    
 	/* Check inputs and count number of valid input lines in input file column 1 */
 	
-	if( check_inputs(argv,argc,pfin,&column_number,pfout,&fs_GHz,&threshold,
+	if( check_jitterhist_inputs(argv,argc,pfin,&column_number,pfout,&fs_GHz,&threshold,
 	&num_moving_average_samples,&use_ave_freq_flag,&ave_freq_MHz,&number_of_input_lines,&correct_slope_flag) != EXIT_SUCCESS)
 		{
 		exit(0);
@@ -191,7 +191,7 @@ if( pzc_stats->num_periods > 0)
 	
 	if ((correct_slope_flag == 1) && (pzc_stats->num_periods > 1))
 		{
-		if ((pdoubles_array = (double *) calloc(DATA_COLUMNS,sizeof(double))) == NULL)
+		if ((pdoubles_array = (double *) calloc(MAXIMUM_NUMBER_OF_DATA_COLUMNS,sizeof(double))) == NULL)
 			{
 			printf("Error allocating memory for pdoubles_array in main()...exiting\n");
 			exit(0);
@@ -217,7 +217,7 @@ if( pzc_stats->num_periods > 0)
 				remove_carriage_return(pinput_string);
 				if (!feof(fpw1))
 					{
-					if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,DATA_COLUMNS)) == EXIT_SUCCESS)
+					if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,MAXIMUM_NUMBER_OF_DATA_COLUMNS)) == EXIT_SUCCESS)
 						{
 						pxy[i].x = pdoubles_array[0];
 						pxy[i].y = pdoubles_array[1];
@@ -275,7 +275,7 @@ if( pzc_stats->num_periods > 0)
 				remove_carriage_return(pinput_string);
 				if (!feof(fpw1))
 					{
-				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,DATA_COLUMNS)) == EXIT_SUCCESS)
+				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,MAXIMUM_NUMBER_OF_DATA_COLUMNS)) == EXIT_SUCCESS)
 					{
 						corrected_neg_edge_tie = pdoubles_array[1] - (pdoubles_array[0]*slope_neg_edge + intercept_neg_edge);
 						if (corrected_neg_edge_tie > corrected_neg_edge_tie_max)

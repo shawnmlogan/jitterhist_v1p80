@@ -12,13 +12,13 @@
 #define BIG_NEG_NUM -1.0e12
 #define EPSILON 1.0e-12
 
-#define DATA_COLUMNS 3
+#define MAXIMUM_NUMBER_OF_DATA_COLUMNS 12
 #define NUMBER_OF_VALUE_STRINGS 12 /*Used for add_units arguments*/
 #define LINELENGTH_OF_VALUE_STRING 20
 #define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.161
-#define VERSION_DATE "11/3/2023"
+#define VERSION 1.162
+#define VERSION_DATE "12/19/2023"
 
 typedef struct {
 	double x,y;
@@ -52,14 +52,15 @@ double deltat, double vthreshold,\
 double *pmax_pp_neg_edge_error,double *pmax_pp_pos_edge_error);
 
 int find_stats_column_one_of_file(char *pfin, double *ave_input_signal, double *min_input_signal, double *max_input_signal,long int *number_of_input_signal_lines);
-int find_stats_column_N_of_file(char *pfin, int column_number, double *ave_input_signal, double *min_input_signal, double *max_input_signal,long int *number_of_input_signal_lines);
+int find_stats_column_N_of_file(char *pfin, int column_number, double *ave_input_signal, double *min_input_signal, double *max_input_signal,long int *number_of_input_signal_lines, int *sorted_flag);
 
-int check_inputs(char *argv[], int argc, char *pfin, int *column_number, char *pfout, double *fs_GHz, double *threshold_value,
+int check_jitterhist_inputs(char *argv[], int argc, char *pfin, int *column_number, char *pfout, double *fs_GHz, double *threshold_value,
 int *num_moving_average_samples, int *use_ave_freq, double *ave_freq_MHz,long int *number_of_input_lines,int *correct_slope_flag);
+int validate_input_file(char *pfin, int *column_number, long int *number_of_input_lines);
 
 int moving_average(char *pfilein, char *pfileout,int column_number,int num_moving_average_samples,long int *pnumber_output_lines);
 
 int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats);
 
 int find_timestamp(char *pdate_string,int max_characters);
-#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhistv161"
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhistv162"

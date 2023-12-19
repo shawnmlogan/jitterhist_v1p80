@@ -1,17 +1,16 @@
 #include "jitterhist.h"
 
-int check_inputs(char *argv[], int argc, char *pfin, int *column_number, char *pfout, double *fs_GHz, double *threshold_value,
+int check_jitterhist_inputs(char *argv[], int argc, char *pfin, int *column_number, char *pfout, double *fs_GHz, double *threshold_value,
 int *num_moving_average_samples, int *use_ave_freq, double *ave_freq_MHz,long int *number_of_input_lines,int *correct_slope_flag)
 {
 int input_error_flag = 0;
-int tokens = 0;
+int tokens = 0, sorted_flag = 1;
+int data_column_number = 0;
 
 char *pinput_string, input_string[LINELENGTH + 1];
 char value_string[NUMBER_OF_VALUE_STRINGS][LINELENGTH_OF_VALUE_STRING + 1];
 
 double ave_input_signal = 0.0, max_input_signal = BIG_NEG_NUM, min_input_signal = BIG_POS_NUM;
-double *pdoubles_array,doubles_array[DATA_COLUMNS];
-double sample_value = 0.0;;
 
 FILE *fpw1;
 
@@ -39,49 +38,27 @@ if ((fpw1 = fopen(pfin,"r")) == NULL)
 		*column_number = atoi(pinput_string);
 
 		/* Check to verify sufficient columns exist in input file */
-
-		if ((pdoubles_array = (double *) calloc(*column_number,sizeof(double))) == NULL)
-			{
-			printf("Error allocating memory for pdoubles_array in find_stats_column_N_of_file()...exiting\n");
-			input_error_flag = 1;
-			}
-		else
-			{
-			fpw1 = fopen(pfin,"r");
-			while(!feof(fpw1) && (input_error_flag == 0))
+		
+		if (validate_input_file(pfin,column_number,number_of_input_lines) != EXIT_SUCCESS)
+	   	input_error_flag = 1;
+	   else
+	   	{
+	   	printf("Input file: %s\n",pfin);
+	   	if (find_stats_column_N_of_file(pfin,*column_number,&ave_input_signal,&min_input_signal,
+			&max_input_signal,number_of_input_lines,&sorted_flag) == EXIT_SUCCESS)
 				{
-				fgets(pinput_string,LINELENGTH,fpw1);
-				remove_carriage_return(pinput_string);
-				if ((parsestring_to_doubles_array(pinput_string,pdoubles_array,&tokens,*column_number)) == EXIT_SUCCESS)
-					{
-					sample_value = pdoubles_array[*column_number-1];
-					if (tokens != *column_number)
-						{
-						printf("Insufficient columns in file \"%s\" to support column %d\n",pfin,*column_number);
-						printf("Enter a column number less than or equal to %d.\n",tokens);
-						input_error_flag = 1;
-						}
-					}
+				printf("Column number: %d\n",*column_number);
 				}
-			fclose(fpw1);
-			}
+			else
+				{
+				printf("find_stats_column_N_of_file() failed...exiting...\n");
+				exit(0);
+				}
 			if (input_error_flag != 1)
 				{
-				printf("Input file: %s\n",pfin);
-				if (find_stats_column_N_of_file(pfin,*column_number,&ave_input_signal,&min_input_signal,
-				&max_input_signal,number_of_input_lines) == EXIT_SUCCESS)
-					{
-					printf("Column number: %d\n",*column_number);
-					}
-				else
-					{
-					printf("find_stats_column_N_of_file() failed...exiting...\n");
-					exit(0);
-					}
-
 				strcpy(pfout,argv[3]);
 				printf("Output file: %s\n",pfout);
-
+	
 				/* Read, assign, and check sample frequency */
 				
 				strcpy(pinput_string,argv[4]);
@@ -102,6 +79,7 @@ if ((fpw1 = fopen(pfin,"r")) == NULL)
 				}
 			}
 		}
+	}
 
 if (input_error_flag != 1)
 	{
