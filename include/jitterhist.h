@@ -17,8 +17,8 @@
 #define LINELENGTH_OF_VALUE_STRING 20
 #define MAXIMUM_NUMBER_OF_MOVING_AVERAGE_ITERATIONS 20
 
-#define VERSION 1.162
-#define VERSION_DATE "12/19/2023"
+#define VERSION 1.163
+#define VERSION_DATE "12/24/2023"
 
 typedef struct {
 	double x,y;
@@ -63,4 +63,4 @@ int moving_average(char *pfilein, char *pfileout,int column_number,int num_movin
 int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats);
 
 int find_timestamp(char *pdate_string,int max_characters);
-#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhistv162"
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhistv163"
