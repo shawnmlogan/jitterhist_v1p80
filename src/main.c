@@ -143,35 +143,44 @@ if( pzc_stats->num_periods > 0)
 	if (pzc_stats->num_periods == 1)
 		{
 		printf("Read a total of %ld period in file \"%s\"\n",pzc_stats->num_periods,pfin);
-		printf("using a threshold value of %s.\n",add_units(threshold,1,"V",value_string[0]));
+		printf("using a threshold value of %s.\n",add_units_2(threshold,1,0,0,"V",value_string[0]));
 		}
 	else
 		{
 		printf("Read a total of %ld periods in file \"%s\"\n",pzc_stats->num_periods,pfin);
-		printf("using a threshold value of %s.\n",add_units(threshold,1,"V",value_string[0]));
+		printf("using a threshold value of %s.\n",add_units_2(threshold,1,0,0,"V",value_string[0]));
 		}
-	printf ("Average time period = %2.6e sec, frequency = %4.6f MHz.\n",\
-	pzc_stats->ave_period, 1.0e-06/pzc_stats->ave_period);
-	printf ("Minimum period = %2.6e sec (%4.6f MHz at %1.6e sec).\n",\
-	pzc_stats->min_period, 1.0e-06/pzc_stats->min_period,pzc_stats->min_period_time);
-	printf ("Maximum period = %2.6e sec (%4.6f MHz at %1.6e sec, delta = %.4f%%).\n",\
-	pzc_stats->max_period, 1.0e-06/pzc_stats->max_period,pzc_stats->max_period_time,100.0*(1.0/pzc_stats->min_period - 1.0/pzc_stats->max_period)/(1.0/pzc_stats->ave_period));
+	printf ("Average time period = %2.6e sec, frequency = %s.\n",\
+	pzc_stats->ave_period, add_units_2(1.0/pzc_stats->ave_period,4,0,0,"Hz",value_string[0]));
+	printf ("Minimum period = %2.6e sec (%s at %s).\n",\
+	pzc_stats->min_period, add_units_2(1.0/pzc_stats->min_period,6,0,0,"Hz",value_string[0]),
+	add_units_2(pzc_stats->min_period_time,6,0,0,"s",value_string[1]));
+	printf ("Maximum period = %2.6e sec (%s at %s, delta = %.4f%%).\n",\
+	pzc_stats->max_period,
+	add_units_2(1.0/pzc_stats->max_period,6,0,0,"Hz",value_string[0]),
+	add_units_2(pzc_stats->max_period_time,6,0,0,"s",value_string[1]),
+	100.0*(1.0/pzc_stats->min_period - 1.0/pzc_stats->max_period)/(1.0/pzc_stats->ave_period));
 	
-	printf ("Average on time = %2.2e sec, Duty cycle = %2.2f %%.\n",\
+	printf ("Average on time = %2.4e sec, Duty cycle = %2.2f %%.\n",\
 	pzc_stats->ave_ontime, 100.0 * pzc_stats->ave_ontime/pzc_stats->ave_period);
-	printf ("Minimum on time = %2.2e sec (Duty cycle = %2.2f %% at %1.6e sec).\n",\
+	printf ("Minimum on time = %2.4e sec (Duty cycle = %2.2f %% at %1.6e sec).\n",\
 	pzc_stats->min_ontime, 100.0 * pzc_stats->min_ontime/pzc_stats->ave_period,pzc_stats->min_ontime_time);
-	printf ("Maximum on time = %2.2e sec (Duty cycle = %2.2f %% at %1.6e sec, delta = %.2f%%).\n",\
-	pzc_stats->max_ontime, 100.0 * pzc_stats->max_ontime/pzc_stats->ave_period,pzc_stats->max_ontime_time,100.0*(pzc_stats->max_ontime - pzc_stats->min_ontime)/pzc_stats->ave_period);
+	printf ("Maximum on time = %2.4e sec (Duty cycle = %2.2f %% at %1.6e sec, delta = %.2f%%).\n",\
+	pzc_stats->max_ontime,
+	100.0 * pzc_stats->max_ontime/pzc_stats->ave_period,
+	pzc_stats->max_ontime_time,
+	100.0*(pzc_stats->max_ontime - pzc_stats->min_ontime)/pzc_stats->ave_period);
 	
-	printf("The calculated average frequency is %4.6f MHz.\n",1.0e-06/pzc_stats->ave_period);
+	printf("The calculated average frequency is %s.\n",
+	add_units_2(1.0e-06/pzc_stats->ave_period,4,0,0,"Hz",value_string[0]));
 	
 	if (use_ave_freq_flag != 1)
 	   {
 	   pzc_stats->ave_period = 1.0/(ave_freq_MHz*1.0e6);
 	   }
 	
-	printf("Using an average frequency of %4.6f MHz to compute jitter.\n",1.0e-06/pzc_stats->ave_period);
+	printf("Using an average frequency of %s to compute jitter.\n",
+	add_units_2(1.0e-06/pzc_stats->ave_period,4,0,0,"Hz",value_string[0]));
 	
 	/*Now that we have average frequency, use this frequency to determine maximum distance
 	of clock edges from desired frequency to give jitter*/
@@ -239,7 +248,7 @@ if( pzc_stats->num_periods > 0)
 				{
 				printf("Removing effect of residual slope in negative edge TIE:\nslope_neg_edge = %1.6e, intercept_neg_edge = %1.6e\n",slope_neg_edge,intercept_neg_edge);
 				pzc_stats->ave_period_corrected = 1.0/(0.0 - slope_neg_edge + 1.0/pzc_stats->ave_period);
-				printf("New estimated frequency is %s.\n", add_units(1.0/pzc_stats->ave_period_corrected,6,"Hz",value_string[0]));
+				printf("New estimated frequency is %s.\n", add_units_2(1.0/pzc_stats->ave_period_corrected,6,0,0,"Hz",value_string[0]));
 				}
 		
 			if (find_slope_intercept_xy(px1y1,i,&slope_pos_edge,&intercept_pos_edge) != EXIT_SUCCESS)
@@ -328,9 +337,9 @@ if( pzc_stats->num_periods > 0)
 		else
 			find_base_filename(pfout,pbase_filename,LINELENGTH);
 		
-		sprintf(ptitle_string,"{/:Bold Sample frequency = %s, number of moving average samples = %d}",add_units(1e9*fs_GHz,1,"Hz",value_string[0]),num_moving_average_samples);
+		sprintf(ptitle_string,"{/:Bold Sample frequency = %s, number of moving average samples = %d}",add_units_2(1e9*fs_GHz,1,0,0,"Hz",value_string[0]),num_moving_average_samples);
 		
-		sprintf(pgnuplot_command_1,"gnuplot -e 'base_filename = \"%s\"; plot_title = \"%s\"; nom_freq_text = \"%s\";' %s/plotting_routines/gnuplot/plot_jitter.gnu \n",pbase_filename,ptitle_string,add_units(1.0/pzc_stats->ave_period_corrected,6,"Hz",value_string[0]),PLOTTING_ROUTINES_DIR);
+		sprintf(pgnuplot_command_1,"gnuplot -e 'base_filename = \"%s\"; plot_title = \"%s\"; nom_freq_text = \"%s\";' %s/plotting_routines/gnuplot/plot_jitter.gnu \n",pbase_filename,ptitle_string,add_units_2(1.0/pzc_stats->ave_period_corrected,6,0,0,"Hz",value_string[0]),PLOTTING_ROUTINES_DIR);
 
 		system(pgnuplot_command_1);
 		
@@ -343,7 +352,7 @@ if( pzc_stats->num_periods > 0)
 	}
 else
 	{
-	printf("There were no periods found in file \"%s\"\nusing a threshold value of %s ",pfin,add_units(threshold,1,"V",value_string[0]));
+	printf("There were no periods found in file \"%s\"\nusing a threshold value of %s ",pfin,add_units_2(threshold,1,0,0,"V",value_string[0]));
 	printf("and a moving average sample size of %d. ",num_moving_average_samples);
 	printf("No analysis was performed.\n");
 	}

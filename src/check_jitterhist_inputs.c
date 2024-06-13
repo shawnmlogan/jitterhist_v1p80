@@ -4,7 +4,7 @@ int check_jitterhist_inputs(char *argv[], int argc, char *pfin, int *column_numb
 int *num_moving_average_samples, int *use_ave_freq, double *ave_freq_MHz,long int *number_of_input_lines,int *correct_slope_flag)
 {
 int input_error_flag = 0;
-int tokens = 0, sorted_flag = 1;
+int tokens = 0, sorted_flag = 1, slope_constant_flag = 0;
 int data_column_number = 0;
 
 char *pinput_string, input_string[LINELENGTH + 1];
@@ -45,7 +45,7 @@ if ((fpw1 = fopen(pfin,"r")) == NULL)
 	   	{
 	   	printf("Input file: %s\n",pfin);
 	   	if (find_stats_column_N_of_file(pfin,*column_number,&ave_input_signal,&min_input_signal,
-			&max_input_signal,number_of_input_lines,&sorted_flag) == EXIT_SUCCESS)
+			&max_input_signal,number_of_input_lines,&sorted_flag,&slope_constant_flag) == EXIT_SUCCESS)
 				{
 				printf("Column number: %d\n",*column_number);
 				}
@@ -73,7 +73,7 @@ if ((fpw1 = fopen(pfin,"r")) == NULL)
 					if (input_error_flag != 1)
 						{
 						*fs_GHz = atof(pinput_string);
-						printf("Sample frequency is %s.\n",add_units((*fs_GHz)*1e9,4,"Hz",value_string[0]));
+						printf("Sample frequency is %s.\n",add_units_2((*fs_GHz)*1e9,4,0,0,"Hz",value_string[0]));
 						}
 					}
 				}
@@ -88,7 +88,7 @@ if (input_error_flag != 1)
 	if (atof(pinput_string) >= max_input_signal)
 		{
 		printf("Threshold value of %s exceeds maximum signal value of %s,\nre-enter a threshold value.\n",
-		add_units(atof(pinput_string),1,"V",value_string[0]),add_units(max_input_signal,3,"V",value_string[1]));
+		add_units_2(atof(pinput_string),1,0,0,"V",value_string[0]),add_units_2(max_input_signal,3,0,0,"V",value_string[1]));
 		input_error_flag = 1;
 		}
 	else
@@ -96,13 +96,13 @@ if (input_error_flag != 1)
 		if (atof(pinput_string) <= min_input_signal)
 			{
 			printf("Threshold value of %s is less than minimum signal value of %s,\nre-enter a threshold value.\n",
-			add_units(atof(pinput_string),1,"V",value_string[0]),add_units(min_input_signal,3,"V",value_string[1]));
+			add_units_2(atof(pinput_string),1,0,0,"V",value_string[0]),add_units_2(min_input_signal,3,0,0,"V",value_string[1]));
 			input_error_flag = 1;
 			}
 		else
 			{
 			*threshold_value = atof(pinput_string);
-			printf("Threshold value is %s.\n",add_units(*threshold_value,3,"V",value_string[0]));
+			printf("Threshold value is %s.\n",add_units_2(*threshold_value,3,0,0,"V",value_string[0]));
 			}
 		}
 	}
@@ -190,7 +190,7 @@ if (input_error_flag != 1)
 					{
 					*use_ave_freq = 0;
 					*ave_freq_MHz = atof(pinput_string);
-					printf("Entered average frequency is %s.\n",add_units((*ave_freq_MHz)*1e6,4,"Hz",value_string[0]));
+					printf("Entered average frequency is %s.\n",add_units_2((*ave_freq_MHz)*1e6,4,0,0,"Hz",value_string[0]));
 					}
 				}
 			}

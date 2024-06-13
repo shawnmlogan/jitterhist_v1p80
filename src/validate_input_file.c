@@ -19,7 +19,7 @@ FILE *fpw1;
 
 if ((pdoubles_array = (double *) calloc(*column_number,sizeof(double))) == NULL)
 	{
-	printf("Error allocating memory for pdoubles_array in find_stats_column_N_of_file()...exiting\n");
+	printf("Error allocating memory for pdoubles_array in validate_input_file()...exiting\n");
 	exit(0);
 	}
 else
@@ -44,9 +44,11 @@ else
 					if (tokens != *column_number)
 						{
 						printf("Insufficient columns in file \"%s\" to support column %d\n",pfin,*column_number);
-						printf("Enter a  column number less than or equal to %d.\n",tokens);
+						printf("Enter a column number less than or equal to %d.\n",tokens);
 						input_error_flag = 1;
 						}
+					else
+						(*number_of_input_lines)++;
 					}
 				}
 			}

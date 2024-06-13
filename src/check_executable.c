@@ -9,7 +9,7 @@ char *pstring, string[LINELENGTH + 1],*pnot_found = "not found";
 FILE *fpw1;
 
 pstring = &string[0];
-sprintf(pstring,"command -v %s || echo \"%s\";\n",pprogram_executable,pnot_found);
+snprintf(pstring,LINELENGTH,"command -v %s || echo \"%s\";\n",pprogram_executable,pnot_found);
 fpw1 = popen(pstring,"r");
 fgets(preturn_string,LINELENGTH,fpw1);
 remove_carriage_return(preturn_string);
