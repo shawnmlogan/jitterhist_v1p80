@@ -2,7 +2,7 @@
 
 void program_info(int verbose)
 {
-printf("\njitterhistv16 v%.3f %s\n\n",VERSION,VERSION_DATE);
+printf("\njitterhist v%.2f %s\n\n",VERSION,VERSION_DATE);
 
 if (verbose == 1)
 	{

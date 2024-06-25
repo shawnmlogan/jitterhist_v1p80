@@ -5,8 +5,8 @@ int validate_input_file(char *pfin, int *column_number, long int *number_of_inpu
 int input_error_flag = 0;
 int tokens = 0;
 
-char *pinput_string, input_string[LINELENGTH + 1];
-char *pinput_string_long, input_string_long[LINELENGTH + 2];
+char *pinput_string, input_string[CSV_FILE_LINELENGTH + 1];
+char *pinput_string_long, input_string_long[CSV_FILE_LINELENGTH + 2];
 
 double *pdoubles_array,doubles_array[MAXIMUM_NUMBER_OF_DATA_COLUMNS];
 
@@ -27,15 +27,15 @@ else
 	fpw1 = fopen(pfin,"r");
 	while(!feof(fpw1) && (input_error_flag == 0))
 		{
-		fgets(pinput_string_long,LINELENGTH + 2,fpw1);
-		if ((int) strlen(pinput_string_long) > LINELENGTH)
+		fgets(pinput_string_long,CSV_FILE_LINELENGTH + 2,fpw1);
+		if ((int) strlen(pinput_string_long) > CSV_FILE_LINELENGTH)
 			{
 			input_error_flag = 1;
-			printf("Reduce line length of input data file \"%s\" to less than %d characters.\n",pfin,LINELENGTH);
+			printf("Reduce line length of input data file \"%s\" to less than %d characters.\n",pfin,CSV_FILE_LINELENGTH);
 			}
 		else
 			{
-			strncpy(pinput_string,pinput_string_long,LINELENGTH);
+			strncpy(pinput_string,pinput_string_long,CSV_FILE_LINELENGTH);
 			remove_carriage_return(pinput_string);
 			if (!feof(fpw1))
 				{

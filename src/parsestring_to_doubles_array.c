@@ -50,7 +50,7 @@ do
 			#endif
 			}
 			#ifdef DEBUG_PARSESTRING_TO_DOUBLES_ARRAY
-				printf("j = %d, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",
+				printf("j = %ld, \"%s\", stopped at \"%s\", strlen(ptemp) = %lu.\n",
 				j,pdouble_string,ptemp,strlen(ptemp));
 			#endif
 		if (errno == ERANGE)
@@ -74,7 +74,7 @@ do
 			else
         		{
         		 #ifdef DEBUG_PARSESTRING_TO_DOUBLES_ARRAY
-					printf("i = %d, Conversion performed successfully to %1.6e!\n",i,temp_double);
+					printf("i = %ld, Conversion performed successfully to %1.6e!\n",i,temp_double);
 				#endif
 				*pdoubles_array = temp_double;
 				pdoubles_array++;

@@ -1,37 +1,21 @@
 # include "jitterhist.h"
 
-int find_base_filename(char *pfin, char *pbase_filename, int max_num_characters)
+int find_base_filename(char *pfin, char *pbase_filename)
 {
 
-int i = 0, error_flag = 0;
-char *plocal_fin, local_fin[LINELENGTH + 1];
+int error_flag = 0;
 char *plocal_base_filename;
 
-plocal_fin = &local_fin[0];
-
-if ((plocal_base_filename = (char *) calloc(max_num_characters + 1,sizeof(char))) == NULL)
+if ((plocal_base_filename = (char *) calloc(strlen(pfin) + 1,sizeof(char))) == NULL)
 	{
-	printf("Error allocating string for appended filename in append_filename_keep_extension()\n");
+	printf("Error allocating string for appended filename in find_base_filename()\n");
 	error_flag = 1;
 	}
 else
 	{
-	strcpy(plocal_fin,pfin);
-
-	/* Create base file name, remove 3 digit extension */
-	
-	for (i = 0; i < strlen(plocal_fin);i++)
-		{
-		if (i < strlen(plocal_fin) - 4)
-			{
-			plocal_base_filename[i] = local_fin[i];
-			}
-		else
-			{
-			plocal_base_filename[i] = '\0';
-			}
-		}
-	strcpy(pbase_filename,plocal_base_filename);
+	strncpy(plocal_base_filename,pfin,strlen(pfin));
+	plocal_base_filename[strlen(pfin) - 4] = '\0';
+	strncpy(pbase_filename,plocal_base_filename,strlen(pfin));
 	free(plocal_base_filename);
 	}
 

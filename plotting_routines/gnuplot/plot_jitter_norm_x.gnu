@@ -8,8 +8,10 @@ set termopt enhanced;
 # nom_freq_text = sprintf("92 MHz");
 # plotting_routines_dir = sprintf("/Users/sml/cproj/jitterhist...");
 
+nom_freq_Hz = 100e6;
+
 input_filename = sprintf("%s.csv",base_filename);
-output_filename = sprintf("%s.png",base_filename);
+output_filename = sprintf("%s_norm.png",base_filename);
 
 # Replace any underscores in filename with "\\\_" to avoid being treated as
 # enhanced text in plot title
@@ -21,8 +23,8 @@ system("rm tempfile tempfile1");
 
 stats input_filename u 1:2 skip 1 nooutput;
 
-x_min = STATS_min_x;
-x_max = STATS_max_x;
+x_min = nom_freq_Hz*STATS_min_x;
+x_max = nom_freq_Hz*STATS_max_x;
 
 neg_error_min_ui = STATS_min_y;
 neg_error_max_ui = STATS_max_y;
@@ -115,7 +117,7 @@ set title plot_header;
 # Offset title using graph coordinates to better fit page (range 0.0 to 1.0)
 set title offset graph -0.04,0.0; 
 
-set xlabel 'Time (s)';
+set xlabel 'Time (normalized to periods of 100 MHz sinusoid)';
 set ylabel 'Time Interval Error (UI)';
 
 set tics out;
@@ -195,7 +197,7 @@ set style textbox opaque fillcolor "white" noborder;
 set style textbox 2 opaque fc "light-cyan" noborder;
 set label 1 summary_label at graph 0.1,0.96 left front font "Verdana,14" boxed bs 2;
 
-plot input_filename u 1:2 title columnhead(2) with lines lw 1,input_filename u 1:3 title columnhead(3) with lines lw 1
+plot input_filename u ($1*nom_freq_Hz):2 title columnhead(2) with lines lw 1,input_filename u 1:3 title columnhead(3) with lines lw 1
 
 pause(5);
 set terminal push;

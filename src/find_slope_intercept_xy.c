@@ -1,14 +1,21 @@
 
 #include "jitterhist.h"
 
-int find_slope_intercept_xy(xy_pair *pxy,long int number_of_xy_data_records,double *pslope, double *pintercept)
+int find_slope_intercept_xy(xy_pair *pxy,long int number_of_xy_data_records,char *ptimestamp,double *pslope, double *pintercept)
 {
 
-long int i = 0, num_equal_y_values = 1;
-int zero_flag = 0;
+long int i = 0, num_equal_y_values = 1, j = 0, number_of_iterations = 0;
+int zero_flag = 0, error_flag = 0;
 
 double sum_x = 0.0, sum_x2 = 0.0, sum_y = 0.0, sum_y2 = 0.0, sum_xy = 0.0;
 double denominator = 0.0, numerator = 0.0, x_mean = 0.0, y_mean = 0.0;
+double y_min = BIG_POS_NUM, y_max = BIG_NEG_NUM;
+double init_slope, coarse_slope = 0.0, coarse_intercept = 0.0, coarse_peak_to_peak = 0.0;
+double fine_slope = 0.0, fine_intercept = 0.0, fine_peak_to_peak = 0.0;
+double ultra_fine_slope = 0.0, ultra_fine_intercept = 0.0, ultra_fine_peak_to_peak = 0.0;
+
+
+FILE *fpw1;
 
 for (i = 0; i < number_of_xy_data_records;i++)
 	{
@@ -44,11 +51,48 @@ if ( denominator == 0)
 	}
 else
 	{
-	*pslope = numerator/denominator;
-	*pintercept = y_mean - *pslope*x_mean;
+	init_slope = numerator/denominator;
+	if(find_min_pp_slope_intercept_xy(pxy,number_of_xy_data_records,ptimestamp,init_slope,x_mean,y_mean,&coarse_slope,&coarse_intercept,&coarse_peak_to_peak) != EXIT_SUCCESS)
+		{
+		printf("Error occurred in coarse find_min_pp_slope_intercept_xy() in find_slope_intercept_xy.c.\n");
+		error_flag = 1;
+		}
+	else
+		{
+		#ifdef DEBUG_FIND_SLOPE_INTERCEPT
+			printf("After coarse slope search, minimum peak_to_peak = %1.6e coarse_slope = %1.6e coarse_intercept = %1.6e\n",
+			coarse_peak_to_peak,coarse_slope,coarse_intercept);
+		#endif	
+		if(find_min_pp_slope_intercept_xy(pxy,number_of_xy_data_records,ptimestamp,coarse_slope,x_mean,y_mean,&fine_slope,&fine_intercept,&fine_peak_to_peak) != EXIT_SUCCESS)
+			{
+			printf("Error occurred in fine find_min_pp_slope_intercept_xy() in find_slope_intercept_xy.c.\n");
+			error_flag = 1;
+			}
+		else
+			{
+			#ifdef DEBUG_FIND_SLOPE_INTERCEPT
+				printf("After fine slope search, minimum peak_to_peak = %1.6e fine_slope = %1.6e fine_intercept = %1.6e\n",
+				fine_peak_to_peak,fine_slope,fine_intercept);
+			#endif
+			if(find_min_pp_slope_intercept_xy(pxy,number_of_xy_data_records,ptimestamp,fine_slope,x_mean,y_mean,&ultra_fine_slope,&ultra_fine_intercept,&ultra_fine_peak_to_peak) != EXIT_SUCCESS)
+				{
+				printf("Error occurred in ultrafine find_min_pp_slope_intercept_xy() in find_slope_intercept_xy.c.\n");
+				error_flag = 1;
+				}
+			else
+				{
+				#ifdef DEBUG_FIND_SLOPE_INTERCEPT
+					printf("After ultrafine slope search, minimum peak_to_peak = %1.6e ultra_fine_slope = %1.6e ultra_fine_intercept = %1.6e\n",
+					ultra_fine_peak_to_peak,ultra_fine_slope,ultra_fine_intercept);
+				#endif	
+				*pslope = ultra_fine_slope;
+				*pintercept = ultra_fine_intercept;
+				}
+			}
+		}	
 	}
 
-if (zero_flag == 1)
+if ((zero_flag == 1) || (error_flag == 1))
 	return EXIT_FAILURE;
 else
 	return EXIT_SUCCESS;

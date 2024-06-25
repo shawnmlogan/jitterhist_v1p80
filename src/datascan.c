@@ -1,6 +1,6 @@
 #include "jitterhist.h"
 
-int datascan(char *pfin,int column_number, char *pfout,int writefile,double ave_period,\
+int datascan(char *pfin,int column_number, char *pfout,int writefile,zero_crossing_stats *pzc_stats,\
 double deltat, double threshold,\
 double *pmax_pp_neg_edge_error,double *pmax_pp_pos_edge_error)
 {
@@ -96,7 +96,7 @@ intercept = (last_value*time - value0*(time - deltat))/deltat;
 printf("time = %1.6e, time-delta = %1.6e.\n",time,time - deltat); */
 t0 = (threshold - intercept)/slope;
 
-/*Zero crossings with positive slope should occur when  freq * time = N where N = 0,2,4,...*/
+/*Zero crossings with positive slope should occur when freq * time = N where N = 0,2,4,...*/
 
 while (!feof(fpw1))
    {
@@ -142,14 +142,14 @@ while (!feof(fpw1))
       tpos = (threshold - intercept)/slope;
 
       num_periods += 1;
-      tneg_error = tneg - t0 - (num_periods - 0.50) * ave_period;
-      tpos_error = tpos - t0 - (num_periods * ave_period);
+      tneg_error = tneg - t0 - (num_periods - (1.0 - pzc_stats->ave_ontime/pzc_stats->ave_period)) * pzc_stats->ave_period;
+      tpos_error = tpos - t0 - (num_periods * pzc_stats->ave_period);
       
-      /*printf("time = %1.8e, num_periods = %ld, ave_period = %1.6e, TIE neg = %1.6e,TIE pos = %1.6e\n",time,num_periods,ave_period,tneg_error/ave_period,tpos_error/ave_period);
+      /*printf("time = %1.8e, num_periods = %ld, pzc_stats->ave_period = %1.6e, TIE neg = %1.6e,TIE pos = %1.6e\n",time,num_periods,pzc_stats->ave_period,tneg_error/pzc_stats->ave_period,tpos_error/pzc_stats->ave_period);
 		printf("At time = %1.6e:tneg_error = %1.6e tpos_error = %1.6e\n",time,tneg_error,tpos_error); */
 		
       if (writefile == 1)
-         fprintf(fpw2, "%1.8e,%1.6e,%1.6e\n",time,tneg_error/ave_period,tpos_error/ave_period);
+         fprintf(fpw2, "%1.12e,%1.12e,%1.12e\n",time,tneg_error/pzc_stats->ave_period,tpos_error/pzc_stats->ave_period);
             
       if (tneg_error > tneg_error_max)
          tneg_error_max = tneg_error;
