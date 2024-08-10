@@ -53,14 +53,19 @@ xtick_increment = base**(floor(log10(xtick_increment)/log10(base) + 0.50));
 x_limit_min = xtick_increment * floor(x_min/xtick_increment);
 x_limit_max = xtick_increment * ceil(x_max/xtick_increment);
 
-set xrange [x_limit_min:x_limit_max];
 if ((x_limit_max - x_limit_min)/xtick_increment < max_num_ticks) {
 set xtics x_limit_min,xtick_increment,x_limit_max;
 } else {
-set xtics x_limit_min,2*xtick_increment,x_limit_max;
-set mxtics 2;
-set grid mxtics;
+	if ((x_limit_max - x_limit_min)/xtick_increment >= 2*max_num_ticks) {
+		x_limit_max = x_limit_min + ceil((x_limit_max - x_limit_min)/(4*xtick_increment))*(4*xtick_increment);
+		set xtics x_limit_min,4*xtick_increment,x_limit_max;
+		set mxtics 2;
+	} else {
+		set xtics x_limit_min,2*xtick_increment,x_limit_max;
+		set mxtics 2;
+	}	
 }
+set xrange [x_limit_min:x_limit_max];
 
 max_num_ticks = 8;
 base = 10.0;
@@ -70,14 +75,20 @@ ytick_increment = base**(floor(log10(ytick_increment)/log10(base) + 0.50));
 y_limit_min = ytick_increment * (floor(y_min/ytick_increment) - 1.0);
 y_limit_max = ytick_increment * (1.0 + ceil(y_max/ytick_increment)); # Allow added height for legend
 
-set yrange [y_limit_min:y_limit_max];
 if ((y_limit_max - y_limit_min)/ytick_increment < max_num_ticks) {
 set ytics y_limit_min,ytick_increment,y_limit_max;
 } else {
-set ytics y_limit_min,2*ytick_increment,y_limit_max;
-set mytics 2;
+	if ((y_limit_max - y_limit_min)/ytick_increment >= 2*max_num_ticks) {
+		y_limit_max = y_limit_min + ceil((y_limit_max - y_limit_min)/(4*ytick_increment))*(4*ytick_increment);
+		set ytics y_limit_min,4*ytick_increment,y_limit_max;
+		set mytics 2;
+	} else {
+		set ytics y_limit_min,2*ytick_increment,y_limit_max;
+		set mytics 2;
+	}	
 set grid mytics;
 }
+set yrange [y_limit_min:y_limit_max];
 
 # Check for a long filename that will exceed plot width; wrap filename if necessary
 if (strlen(input_filename) > 80) {
@@ -126,16 +137,19 @@ set grid xtics;
 set grid ytics;
 
 if ((x_limit_max - x_limit_min > 1) && (x_limit_max - x_limit_min < 10000)) {
-set format x "%.0f";
+num_digits = floor(log10(abs(x_limit_max)/xtick_increment));
+format_specifier = sprintf("%%.%df",num_digits);
+set format x format_specifier;
 } else {
 num_digits = floor(log10(abs(x_limit_max)/xtick_increment));
 format_specifier = sprintf("%%.%de",num_digits);
 set format x format_specifier;
-# set format x "%.1e";
 }
 
 if ((y_limit_max - y_limit_min > 1) && (y_limit_max - y_limit_min < 10000)) {
-set format y "%.0f";
+num_digits = floor(log10(abs(y_limit_max)/ytick_increment));
+format_specifier = sprintf("%%.%df",num_digits);
+set format y format_specifier;
 } else {
 num_digits = floor(log10(abs(y_limit_max)/ytick_increment));
 format_specifier = sprintf("%%.%de",num_digits);

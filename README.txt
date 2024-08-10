@@ -1,10 +1,10 @@
 5.	Program Installation
 
-The current version of jitterhist is v1.71 and its source and documentation are available in the compressed tar file “jitterhist_v1p71_080524.tar.gz”. The most recent and stable version may be downloaded from reference [5]. To install the program and create the executable “jitterhist”, enter Example command line [3] in the directory in which you wish to locate the program.
+The current version of jitterhist is v1.72 and its source and documentation are available in the compressed tar file “jitterhist_v1p72_080924.tar.gz”. The most recent and stable version may be downloaded from reference [5]. To install the program and create the executable “jitterhist”, enter Example command line [3] in the directory in which you wish to locate the program.
 
-			$ tar -xvzf jitterhist_v1p71_080524.tar.gz		Example command line [3]
+			$ tar -xvzf jitterhist_v1p72_080924.tar.gz		Example command line [3]
 
-This will create a directory jitterhist_v1p71 and extract its directory structure:
+This will create a directory jitterhist_v1p72 and extract its directory structure:
 
 			Documentation/			include/					src/
 			README.txt				plotting_routines/
@@ -21,5 +21,5 @@ References:
 
 [5]	https://1drv.ms/u/s!AnM-GsAEZPoSsistH2ga2HiOVW6h?e=XOh71c
 
-8/7/2024
+8/9/2024
 
