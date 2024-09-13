@@ -432,7 +432,7 @@ if (pjh_inputs->num_moving_average_samples > 0)
 		else
 			strncpy(ptie_filename,pjh_inputs->poutput_filename,FILENAME_LINELENGTH);
 	
-		if (((px = calloc((psd_length),sizeof(double))) == NULL) || ((py = calloc((psd_length),sizeof(double))) == NULL) || ((pz = calloc((psd_length),sizeof(double))) == NULL))
+		if (((px = calloc((psd_length + 1),sizeof(double))) == NULL) || ((py = calloc((psd_length),sizeof(double))) == NULL) || ((pz = calloc((psd_length),sizeof(double))) == NULL))
 			{
 			printf("Error allocating memory to psd data array (x),\npsd data array (y) or psd array (w)...exiting...\n");
 			exit(0);

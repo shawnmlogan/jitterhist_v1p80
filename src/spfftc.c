@@ -11,14 +11,14 @@
 /* AND SO FORTH.  X(N-1) BECOMES THE LAST COMPONENT. */
 
 
-void spfftc(complex *x, long *n, long *isign)
+void spfftc(complex *x, long int *n, long int *isign)
 
 {
     /* Builtin functions */
     void complex_exp();
 
     /* Local variables */
-    long i, l, m, mr,tmp_int;
+    long int i, l, m, mr,tmp_int;
     complex t, tmp_complex, tmp;
     double pisign;
 

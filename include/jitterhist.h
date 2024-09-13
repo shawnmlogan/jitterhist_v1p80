@@ -7,8 +7,8 @@
 #include <time.h>
 #include <sys/resource.h>
 
-#define VERSION 1.72
-#define VERSION_DATE "8/9/2024"
+#define VERSION 1.73
+#define VERSION_DATE "9/13/2024"
 
 #define LINELENGTH 128
 #define CSV_FILE_LINELENGTH 180
@@ -165,9 +165,9 @@ int replace_string(char *pinput_string,char *poutput_string,char *porig_string,c
 
 long int parse_3_column_csv_file(char *pinput_filename,long int start_line,long int stop_line,int x_column_number,int y_column_number,int z_column_number,double *px,double *py,double *pz);
 
-void spfftc(complex *x, long *n, long *isign);
-void sppowr(double *x, double *y, double *work, long *lx, 
-long *ly, long *iwindo, double *ovrlap, long *nsgmts, long *error);
+void spfftc(complex *x, long int *n, long int *isign);
+void sppowr(double *x, double *y, double *work, long int *lx, 
+long int *ly, long int *iwindo, double *ovrlap, long int *nsgmts, long int *error);
 
 int find_window_type(long int window_num, char *pwindow_type);
 double mean(double *x, long int N);
@@ -175,4 +175,4 @@ void print_repeated_char(char c,unsigned int N);
 double min(double *px, long int N);
 double rms(double *px, long int N,double *paverage,int zero_mean_rms_flag);
 
-#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p72_080924"
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p73_091324"
