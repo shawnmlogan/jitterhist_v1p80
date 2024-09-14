@@ -432,7 +432,7 @@ if (pjh_inputs->num_moving_average_samples > 0)
 		else
 			strncpy(ptie_filename,pjh_inputs->poutput_filename,FILENAME_LINELENGTH);
 	
-		if (((px = calloc((psd_length + 1),sizeof(double))) == NULL) || ((py = calloc((psd_length),sizeof(double))) == NULL) || ((pz = calloc((psd_length),sizeof(double))) == NULL))
+		if (((px = calloc((psd_length + 1),sizeof(double))) == NULL) || ((py = calloc((psd_length + 1),sizeof(double))) == NULL) || ((pz = calloc((psd_length + 1),sizeof(double))) == NULL))
 			{
 			printf("Error allocating memory to psd data array (x),\npsd data array (y) or psd array (w)...exiting...\n");
 			exit(0);
@@ -460,7 +460,7 @@ if (pjh_inputs->num_moving_average_samples > 0)
 				pz[i] = pz[i] - mean_z_ui;
 				}
 
-			if (((pneg_edge_error_psd = calloc((psd_length/2),sizeof(double))) == NULL) || ((ppos_edge_error_psd = calloc((psd_length/2),sizeof(double))) == NULL) || ((pw = calloc((psd_length + 2),sizeof(double))) == NULL))
+			if (((pneg_edge_error_psd = calloc((psd_length/2 + 1),sizeof(double))) == NULL) || ((ppos_edge_error_psd = calloc((psd_length/2 + 1),sizeof(double))) == NULL) || ((pw = calloc((2*(psd_length/2 + 1) + 2),sizeof(double))) == NULL))
 				{
 				printf("Error allocating memory to output psd data arrays (pneg_edge_error_psd, pneg_edge_error_psd )\nor work array (pw)...exiting...\n");
 				exit(0);
@@ -480,13 +480,13 @@ if (pjh_inputs->num_moving_average_samples > 0)
 					}
 				overlap = PSD_OVERLAP;
 				segment_sublength = PSD_SEGMENT_SUBLENGTH;
-				xnpoints = psd_length - 1;
+				xnpoints = psd_length;
 				ynpoints = psd_length/(2*segment_sublength);
 				if ((pjh_inputs->correct_slope_flag == 1) && (pzc_stats->num_periods > 1))
 					frequency_increment_Hz = (0.50/pzc_stats->ave_period_corrected)/((double) ynpoints);
 				else
 					frequency_increment_Hz = (0.50/pzc_stats->ave_period)/((double) ynpoints);
-										
+								
 				sppowr(py,pneg_edge_error_psd,pw,&xnpoints,&ynpoints,&window_number,&overlap,&num_segments,&psd_error_neg_edge);
 				
 				/* Clear pw array before starting second psd analysis */

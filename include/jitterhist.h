@@ -7,8 +7,8 @@
 #include <time.h>
 #include <sys/resource.h>
 
-#define VERSION 1.73
-#define VERSION_DATE "9/13/2024"
+#define VERSION 1.74
+#define VERSION_DATE "9/14/2024"
 
 #define LINELENGTH 128
 #define CSV_FILE_LINELENGTH 180
@@ -175,4 +175,4 @@ void print_repeated_char(char c,unsigned int N);
 double min(double *px, long int N);
 double rms(double *px, long int N,double *paverage,int zero_mean_rms_flag);
 
-#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p73_091324"
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p74_091424"
