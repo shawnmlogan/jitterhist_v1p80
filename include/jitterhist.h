@@ -5,17 +5,19 @@
 #include <ctype.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/stat.h>
 #include <sys/resource.h>
 
-#define VERSION 1.74
-#define VERSION_DATE "9/14/2024"
+#define VERSION 1.80
+#define VERSION_DATE "5/11/2025"
 
 #define LINELENGTH 128
+#define LOGFILE_LINELENGTH 1024
 #define CSV_FILE_LINELENGTH 180
 #define FILENAME_LINELENGTH 255 /* Maximum number of characters allowed in OS X filename */
 #define PREFIX_LINELENGTH 0
-#define SUFFIX1_LINELENGTH 12 /* used for appending "_corrected" to csv and png filename */
-#define SUFFIX2_LINELENGTH 80 /* used for appending psd computation parameters to csv and png filename */
+#define SUFFIX1_LINELENGTH 12 /* Used for appending "_corrected" to csv and png filename */
+#define SUFFIX2_LINELENGTH 80 /* Used for appending psd computation parameters to csv and png filename */
 #define MAXIMUM_INPUT_FILENAME_LINELENGTH FILENAME_LINELENGTH - PREFIX_LINELENGTH - (SUFFIX1_LINELENGTH + SUFFIX2_LINELENGTH)
 #define TITLE_LINELENGTH 255
 #define COMMAND_LINELENGTH 1024
@@ -23,6 +25,13 @@
 #define BIG_POS_NUM 1.0e12
 #define BIG_NEG_NUM -1.0e12
 #define EPSILON 1.0e-12
+
+#ifdef EXIT_CHARS
+	char exitchars[] = {'q','Q'};
+	int num_exitchars = sizeof(exitchars)/sizeof(exitchars[0]);
+#endif
+
+typedef enum { FALSE, TRUE } Boolean;
 
 /* Print gnuplot commands to terminal if PRINT_GNUPLOT_COMMAND is defined */
 
@@ -48,7 +57,7 @@
 #define MAX_NEG_EDGE_POS_EDGE_FREQ_DIFF_PPM 50
 
 #define MAXIMUM_NUMBER_OF_DATA_COLUMNS 12
-#define NUMBER_OF_VALUE_STRINGS 12 /*Used for add_units arguments*/
+#define NUMBER_OF_VALUE_STRINGS 12 /* Used for add_units arguments */
 #define LINELENGTH_OF_VALUE_STRING 20
 
 #define SAVE_MOVING_AVERAGE_FILES 0 /* Set to 1 if want to save files containing moving average results */
@@ -61,9 +70,29 @@
 /* Choose default window type for phase noise analysis */
 
 #define LIMIT_MAX_PHASE_NOISE_DBC_PER_HZ BIG_POS_NUM
-#define PSD_WINDOW_TYPE 7
+
+/* With OPTIMIZE_PSD_WINDOW set to 1, an exhaustive search of all selected windows is performed
+to determine window that minimizes rms TIE between phase noise and temporal rms TIE */
+/* With OPTIMIZE_PSD_WINDOW set to 0, PSD_WINDOW_TYPE is chosen for PSD analysis */
+
+/* #define OPTIMIZE_PSD_WINDOW 1 */
+#define OPTIMIZE_PSD_WINDOW 0
+#define PSD_WINDOW_TYPE 1
+/* #define PSD_WINDOW_TYPE 7 */
+#define MAXIMUM_NUMBER_OF_PSD_WINDOWS 7
+#define MINIMUM_PSD_WINDOW_NUMBER 1
+#define MAXIMUM_PSD_WINDOW_NUMBER MAXIMUM_NUMBER_OF_PSD_WINDOWS
 #define PSD_SEGMENT_SUBLENGTH 1
 #define PSD_OVERLAP 0.0
+/* #define DEBUG_OPTIMIZE_PSD_WINDOW */
+
+#define FREQUENCY_DIFF_TO_SKIP_INTERPOLATION 0.001 /* Constant for phase noise integration function */
+#define NUMBER_OF_INTERPOLATING_POINTS 3 /* Constant for phase noise integration function */
+/* #define DEBUG_INTEGRATE_PN_UI */
+
+enum integration_type {BOXCAR,POWER};
+#define INTEGRATION_METHOD BOXCAR /* Most accurate for integrating discrete phase noise data */
+#define LOG10_PSD_TO_PHASE_NOISE_CONVERSION_FACTOR 10.0*log10(2.0*pow(M_PI,2))
 
 /* Choose to open png files with OPEN_PNG_FILES_FLAG set to 1 */
 
@@ -104,6 +133,7 @@ typedef struct {
 	} zero_crossing_stats;	
 
 typedef struct {
+	int file_entry_flag; /* Flag to indicate if entry source is a file (1) or command line (0) */
 	char *pinput_filename;
 	char input_filename[FILENAME_LINELENGTH + 1];
 	long int number_of_input_lines;
@@ -118,6 +148,11 @@ typedef struct {
 	char output_filename[FILENAME_LINELENGTH + 1];
 	int enable_plot_flag;
 	char *pgnuplot_path;
+	long int psd_window_numbers_list[MAXIMUM_NUMBER_OF_PSD_WINDOWS];
+	long int *ppsd_window_numbers_list;
+	int number_of_psd_windows;
+	int optimize_window_flag;
+	long int window_number;
 	char gnuplot_path[LINELENGTH + 1];
 	char *ptimestamp;
 	char timestamp[LINELENGTH + 1];
@@ -133,9 +168,18 @@ typedef struct {
 	double r, i;
 } doublecomplex;
 	
-/*Function prototypes*/
+/* Function prototypes */
 
-void program_info(int verbose);
+int filecheck(char *pfilename);
+Boolean check_for_cr_only(char *pline);
+Boolean check_for_quit_characters(char *pline);
+void remove_whitespace(char *pstring);
+void remove_whitespace_only(char *pstring);
+void remove_carriage_return(char *pline);
+int pop_data(char *pfin, char **ppfile_argv,jitterhist_inputs *pjh_inputs);
+int assign(char *pidentifier,char *pentry, char **ppfile_argv, jitterhist_inputs *pjh_inputs);
+void create_sample_file(char *pfname);
+int parsecsv_to_array(char *pdummy,long int *ppsd_windows_list,int *parray_size,int max_array_size, double range_min, double range_max);
 void remove_carriage_return(char *pline);
 int check_executable(char *pprogram_executable,char *preturn_string);
 int check_osx_executable(char *pprogram_executable,char *preturn_string);
@@ -153,12 +197,12 @@ double *pmax_pp_neg_edge_error,double *pmax_pp_pos_edge_error);
 
 int find_stats_column_N_of_file(char *pfin, int column_number, double *ave_input_signal, double *min_input_signal, double *max_input_signal,long int *number_of_input_signal_lines, int *sorted_flag, int *slope_constant_flag);
 
-int check_jitterhist_inputs(char *argv[], int argc, jitterhist_inputs *pjh_inputs);
+int check_jitterhist_inputs(char *argv[], int argc, char *plog_string,jitterhist_inputs *pjh_inputs);
 
 int validate_input_file(char *pfin, int *column_number, long int *number_of_input_lines);
 int moving_average(char *pfilein, char *pfileout,int column_number,int num_moving_average_samples,long int *pnumber_output_lines);
 
-int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats);
+int find_zero_crossings(char *pfin, double threshold, double deltat, int number_of_data_columns, zero_crossing_stats *pzc_stats,jitterhist_inputs *pjh_inputs);
 
 int find_timestamp(char *pdate_string,int max_characters);
 int replace_string(char *pinput_string,char *poutput_string,char *porig_string,char *pnew_string,int max_output_string_length);
@@ -168,6 +212,22 @@ long int parse_3_column_csv_file(char *pinput_filename,long int start_line,long 
 void spfftc(complex *x, long int *n, long int *isign);
 void sppowr(double *x, double *y, double *work, long int *lx, 
 long int *ly, long int *iwindo, double *ovrlap, long int *nsgmts, long int *error);
+double spwndo(long int *type, long int *n, long int *k);
+void spmask(double *x, long int *lx, long int *type, double *tsv, long int *error);
+
+long pow_ii(long *ap, long *bp);
+
+void complex_div(complex *quotient, complex *numerator, complex *denominator);;
+void complex_exp(complex *r, complex *z);;
+void pow_ci(complex *result, complex *a, long *b);
+void pow_zi(doublecomplex *p, doublecomplex *a, long *b); 	/* p = a**b  */
+void r_cnjg(complex *r, complex *z);
+void z_div(doublecomplex *quotient, doublecomplex *numerator, doublecomplex *denominator);
+
+double complex_abs(complex *z);
+double pow_ri(double *ap, long *bp);
+double r_mod(double *x, double *y);
+double r_sign(double *a, double *b);
 
 int find_window_type(long int window_num, char *pwindow_type);
 double mean(double *x, long int N);
@@ -175,4 +235,12 @@ void print_repeated_char(char c,unsigned int N);
 double min(double *px, long int N);
 double rms(double *px, long int N,double *paverage,int zero_mean_rms_flag);
 
-#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p74_091424"
+int find_psd_and_integrate(double *py,double *pedge_error_psd,double *pw,long int *pxnpoints,long int *pynpoints,long int *pwindow_number,double *poverlap,long int *pnum_segments,double *pfreq_pnoise,double *pedge_error_pnoise,int integration_method,int interpolate_pn_flag, double frequency_increment_Hz,int zero_mean_rms_flag,double *pedge_error_pnoise_rms_ui,jitterhist_inputs *pjh_inputs,long int *ppsd_error_edge);
+
+int integrate_pn_ui(double *pfreq_Hz,double *pn_dBc,long int number_of_data_points,int integration_type,jitterhist_inputs *pn_input,double min_integration_freq_Hz,double max_integration_freq_Hz,int interpolate_pn_flag, int number_of_interpolating_points, double *pintegral);
+int lin_interpolate_data(double *px,double *py,long int number_of_data_points,double *px_out, double *py_out,long int number_of_output_data_points,jitterhist_inputs *pjitterhist_inputs);
+double max(double *px, long int N);
+
+void print_string_to_log(char *pstring, jitterhist_inputs *pjitterhist_inputs);
+
+#define PLOTTING_ROUTINES_DIR "/Users/sml/cproj/jitterhist/jitterhist_v1p80_051125"

@@ -1,10 +1,11 @@
 # include "jitterhist.h"
 
-int find_zero_crossings(char *pfin, double threshold, double deltat, int column_number, zero_crossing_stats *pzc_stats)
+int find_zero_crossings(char *pfin, double threshold, double deltat, int column_number, zero_crossing_stats *pzc_stats,jitterhist_inputs *pjh_inputs)
 {
 int j, found_value_flag = 0;
 int tokens = 0;
 
+char *plog_string,log_string[LOGFILE_LINELENGTH + 1];
 char *pinput_string, input_string[LINELENGTH+1];
 
 double time = 0.0;
@@ -26,13 +27,15 @@ FILE *fpw1;
 
 /*Assign pointers*/
 
+plog_string = &log_string[0];
 pinput_string = &input_string[0];
 pvalue0 = &value0;
 plast_value = &last_value;
 
 if ((pdoubles_array = (double *) calloc(column_number,sizeof(double))) == NULL)
 	{
-	printf("Error allocating memory for pdoubles_array in main()...exiting\n");
+	snprintf(plog_string,LOGFILE_LINELENGTH,"Error allocating memory for pdoubles_array in main()...exiting\n");
+	print_string_to_log(plog_string,pjh_inputs);
 	exit(0);
 	}
 
@@ -55,7 +58,8 @@ while ((found_value_flag == 0) && !feof(fpw1))
 
 if (found_value_flag == 0)
 	{
-	printf("Reached end of input data file and did not find an initial valid value.\n");
+	snprintf(plog_string,LOGFILE_LINELENGTH,"Reached end of input data file and did not find an initial valid value.\n");
+	print_string_to_log(plog_string,pjh_inputs);
 	exit(0);
 	}
 	
@@ -115,7 +119,8 @@ else
 	t0 = (threshold - intercept)/slope;
 	interpolated_value0 = slope*t0 + intercept;
 	
-	printf("First threshold crossing at time %1.8e sec, interpolated_value is %1.8e.\n",t0, interpolated_value0);
+	snprintf(plog_string,LOGFILE_LINELENGTH,"First threshold crossing at time %1.8e sec, interpolated_value is %1.8e.\n",t0, interpolated_value0);
+	print_string_to_log(plog_string,pjh_inputs);
 	
 	while (!feof(fpw1))
 	   {

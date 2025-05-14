@@ -14,9 +14,6 @@
 void spfftc(complex *x, long int *n, long int *isign)
 
 {
-    /* Builtin functions */
-    void complex_exp();
-
     /* Local variables */
     long int i, l, m, mr,tmp_int;
     complex t, tmp_complex, tmp;

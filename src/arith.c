@@ -77,7 +77,6 @@ void complex_exp(complex *r, complex *z)
 
 void pow_ci(complex *result, complex *a, long *b)
 {
-    void pow_zi();
     doublecomplex p1, a1;
 
     a1.r = (double) a->r;
@@ -157,7 +156,6 @@ double pow_ri(double *ap, long *bp)
 void pow_zi(doublecomplex *p, doublecomplex *a, long *b) 	/* p = a**b  */
 
 {
-    void z_div();
     long n;
     double t;
     doublecomplex x;
@@ -213,7 +211,7 @@ void r_cnjg(complex *r, complex *z)
 
 double r_mod(double *x, double *y)
 {
-    double floor(), quotient;
+    double quotient;
 
     if( (quotient = (double) (*x / *y)) >= 0)
     {
