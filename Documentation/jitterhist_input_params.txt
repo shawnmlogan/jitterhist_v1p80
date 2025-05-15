@@ -1,0 +1,26 @@
+* Comment lines begin with * or do not contain a colon
+* Enter a value for each input after the colon delimiter
+filename_with_data_samples_(csv format): <Enter your csv input file with data samples>
+column_number: <Enter column number of your csv input file with data samples>
+output_csv_filename: <Enter your csv output filename with TIE results>
+sample_rate_in_GHz: <Enter the sampling rate of your data samples in GHz>
+signal_threshold_(V): <Enter the logic threshold in Volts>
+num_moving_average_samples: <Enter the number of moving average samples to use for TIE computation (set to 0 for none)>
+correct_slope?_(y/n): <Enter yes to correct slope of computed TIE or no to leave uncorrected>
+Use_ave_frequency?_(y/n): <Enter yes to compute TIE using the computed average frequency or no to enter a frequency in MHz>
+Average_frequency_to_use_if_no_(MHz): <If above entry is a no, enter the frequency in MHz to compute TIE>
+Optimize_window_function?_(y/n): <Enter yes to optimize window used to compute phase noise or no to use a single window>
+*
+* Window numbers for available window types:
+*
+* Rectangular 1
+* Tapered rectangular 2
+* Triangular 3
+* Hanning 4
+* Hamming 5
+* Blackman 6
+* Blackman-hanning 7
+*
+List_of_window_numbers_for_optimization_if_yes: <Enter comma separated list of window numbers to use for optimization if optimization entry is a yes>
+Window_number_if_no: <Enter window number if optimization entry is a no>
+plot_outputs?_(y/n): <Enter yes to enable plots or no to disable plots>
